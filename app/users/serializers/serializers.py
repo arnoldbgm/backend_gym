@@ -11,3 +11,9 @@ class RegisterUserSerializer(serializers.ModelSerializer):
                 'write_only': True
             }
         }
+
+
+class AllUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserModel
+        fields = '__all__'

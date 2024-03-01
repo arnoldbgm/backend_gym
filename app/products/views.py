@@ -64,8 +64,8 @@ class GetSingleProductView(RetrieveAPIView):
 
 
 class PatchProductsView(UpdateAPIView):
-    # serializer_class = PatchProductsSerializer
-
+    serializer_class = PatchProductsSerializer
+    
     def update(self, request, pk=int, **kwargs):
         product = ProductsModel.objects.filter(id=pk).first()
         if not product:
