@@ -1,8 +1,8 @@
 from django.shortcuts import render
-from rest_framework.generics import CreateAPIView, ListAPIView, DestroyAPIView, RetrieveAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView, DestroyAPIView, RetrieveAPIView, UpdateAPIView
 from rest_framework.response import Response
 from rest_framework.request import Request
-from .serializers.serializers import RegisterProductSerializer, ObtainAllProductsSerializer, GetOneProductsSerializer
+from .serializers.serializers import RegisterProductSerializer, ObtainAllProductsSerializer, GetOneProductsSerializer, PatchProductsSerializer
 from .models import ProductsModel
 # Create your views here.
 
@@ -61,3 +61,33 @@ class GetSingleProductView(RetrieveAPIView):
             return Response(data={'msg': 'El producto que estas buscando no existe'}, status=404)
         serializador = GetOneProductsSerializer(product)
         return Response(data={'msg': 'El producto se encontro exitosamente', 'data': serializador.data}, status=201)
+
+
+class PatchProductsView(UpdateAPIView):
+    # serializer_class = PatchProductsSerializer
+
+    def update(self, request, pk=int, **kwargs):
+        product = ProductsModel.objects.filter(id=pk).first()
+        if not product:
+            return Response(data={'msg': 'El producto que estás intentando actualizar no existe'}, status=404)
+
+        serializer = PatchProductsSerializer(
+            #instance valor que se actualizara
+            #data el valor que enviamos
+            #partial señala como se actualizara
+            instance=product, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+
+        updated_data = serializer.validated_data
+
+        if updated_data.get('nombreProducto') == product.nombreProducto:
+            return Response(data={'msg': 'Estás enviando el mismo nombre del producto que está registrado en la base de datos'}, status=400)
+
+        if updated_data.get('precioProducto') == product.precioProducto:
+            return Response(data={'msg': 'Estás enviando el mismo precio del producto que está registrado en la base de datos'}, status=400)
+
+        if updated_data.get('cantidadProducto') == product.cantidadProducto:
+            return Response(data={'msg': 'Estás enviando la misma cantidad del producto que está registrada en la base de datos'}, status=400)
+
+        serializer.save()
+        return Response(data={'msg': 'El producto se actualizó exitosamente', 'data': serializer.data}, status=200)

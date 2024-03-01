@@ -19,4 +19,7 @@ class GetOneProductsSerializer(serializers.ModelSerializer):
         model = ProductsModel
         fields = '__all__'
 
-
+class PatchProductsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductsModel
+        fields = '__all__'
